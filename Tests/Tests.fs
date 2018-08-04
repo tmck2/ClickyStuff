@@ -34,6 +34,15 @@ let ``collapseEmptyColumns works correctly`` () =
     Assert.Equal<Board>(expected, actual)
 
 [<Fact>]
+let ``collapseEmptyColumns on empty board`` () =
+    let initial = mkLevel [".."
+                           ".."
+                           ".."]
+    let expected = initial
+    let actual = collapseEmptyColumns initial
+    Assert.Equal<Board>(expected, actual)
+
+[<Fact>]
 let ``transposeBoard on a transposed board gives original`` () =
     let initial = mkLevel [".c"
                            "s."

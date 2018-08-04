@@ -23,7 +23,8 @@ let mkLevel (arr:string list) : Board =
     let rec mkLevel' row = function
         | x::xs -> (processRow row 0 x)::mkLevel' (row+1) xs
         | [] -> []
-    mkLevel' 0 (arr |> List.map Seq.toList)
+    let stringToArray = List.map Seq.toList
+    mkLevel' 0 (arr |> stringToArray)
 
 let getCellAt (board:Board) (pos:Position) =
     let row,col = pos
@@ -49,7 +50,9 @@ let connectedCellsWithSameType (pos:Position) (board:Board) =
     let rec walk gem pos dir visited =
         let step dir = 
             let next = pos |+| dir
-            (if not (List.contains next visited) && (gemAt next) = gem then
+            (if not (List.contains next visited)
+             && (gemAt next) = gem
+             && not ((gemAt next) = None) then
                 next::walk gem next dir (pos::visited)
             else
                 [])
@@ -85,15 +88,21 @@ let dropGems (board:Board) : Board =
             |> padLeft None h)
     |> transposeBoard
 
-let collapseEmptyColumns (board:Board) : Board =
-    let w = List.length board.[0]
-    board
-    |> transposeBoard
-    |> List.filter(fun row ->
-        not (List.forall (fun cell -> cell = None) row))
-    |> transposeBoard
-    |> List.map (padRight None w)
+let isEmpty board =
+    List.forall (fun rows -> List.forall (fun cell -> cell = None) rows) board
 
+let collapseEmptyColumns (board:Board) : Board =
+    if isEmpty board then
+        board
+    else
+        let w = List.length board.[0]
+        board
+        |> transposeBoard
+        |> List.filter(fun row ->
+            not (List.forall (fun cell -> cell = None) row))
+        |> transposeBoard
+        |> List.map (padRight None w
+)
 let removeGemsAt locs (board:Board) : Board =
     board
     |> List.mapi (fun row cells ->
@@ -108,7 +117,24 @@ let handleEvent event (board:Board) : Board =
     match event with
     | CellClicked (row, col) ->
         let connected = connectedCellsWithSameType (row, col) board
-        board
-        |> removeGemsAt connected
-        |> dropGems
-        |> collapseEmptyColumns
+        if List.length connected >= 2 then
+            board
+            |> removeGemsAt connected
+            |> dropGems
+            |> collapseEmptyColumns
+        else
+            board
+
+let mkRandomBoard rows cols seed =
+    let r = new System.Random(seed)
+    [for _ in [0..rows-1] ->
+        [for _ in [0..cols] ->
+            let i = r.Next(0,4)
+            match i with
+            | 0 -> Some Heart
+            | 1 -> Some Spade
+            | 2 -> Some Club
+            | 3 -> Some Diamond
+            | _ -> None
+        ]
+    ]
