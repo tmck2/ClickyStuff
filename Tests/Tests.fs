@@ -5,6 +5,26 @@ open Types
 open Domain
 
 [<Fact>]
+let ``handleEvent CellClicked`` () =
+    let initial = mkLevel ["scd"
+                           "ssd"
+                           "ssd"]
+    let expected = mkLevel [".d."
+                            ".d."
+                            "cd."]
+    let actual = handleEvent (CellClicked (1,1)) initial
+    Assert.Equal<Board>(expected, actual) 
+
+[<Fact>]
+let ``removeGemsAt works correctly`` () =
+    let initial = mkLevel ["ss"
+                           "ss"]
+    let expected = mkLevel ["s."
+                            ".s"]
+    let actual = removeGemsAt [0,1; 1,0] initial
+    Assert.Equal<Board>(expected, actual)
+    
+[<Fact>]
 let ``collapseEmptyColumns works correctly`` () =
     let initial = mkLevel ["....."
                            "s.s.."]
@@ -50,7 +70,7 @@ let ``connectedCellsWithSameType returns exptected results`` () =
                          "ssd"
                          "ssd"] 
     let expected = [0,0; 1,0; 1,1; 2,0; 2,1] |> List.sort
-    let actual = connectedCellsWithSameType board (1,0) |> List.sort
+    let actual = connectedCellsWithSameType (1,0) board |> List.sort
     Assert.Equal<Position list>(expected, actual) 
 
 [<Fact>]

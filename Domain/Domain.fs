@@ -41,7 +41,7 @@ let getNeighboringCells (board:Board) (pos:Position) =
             r >= 0 && r < List.length board &&
             c >= 0 && c < List.length board.[0])
 
-let connectedCellsWithSameType (board:Board) (pos:Position) =
+let connectedCellsWithSameType (pos:Position) (board:Board) =
     let gemAt pos =
         match getCellAt board pos with
         | None -> None
@@ -93,3 +93,22 @@ let collapseEmptyColumns (board:Board) : Board =
         not (List.forall (fun cell -> cell = None) row))
     |> transposeBoard
     |> List.map (padRight None w)
+
+let removeGemsAt locs (board:Board) : Board =
+    board
+    |> List.mapi (fun row cells ->
+        cells |>
+        List.mapi (fun col cell ->
+            if List.contains (row,col) locs then
+                None
+            else
+                cell))
+
+let handleEvent event (board:Board) : Board =
+    match event with
+    | CellClicked (row, col) ->
+        let connected = connectedCellsWithSameType (row, col) board
+        board
+        |> removeGemsAt connected
+        |> dropGems
+        |> collapseEmptyColumns
