@@ -1,7 +1,5 @@
 module WebUI
 
-open Fable.Core
-open Fable.Core.JsInterop
 open Fable.Import
 open Types
 open Domain
@@ -10,6 +8,8 @@ let width = 15
 let height = 15
 
 let mutable board = mkRandomBoard height width 1000
+
+let coinSound = Sound.create "../sounds/coin.wav"
 
 let gemImages = 
     ["heart.png";"hex.png";"round.png";"star.png"]
@@ -23,15 +23,6 @@ let imageGrid =
             Browser.document.createElement ("img")
         ]
     ]
-
-let coinSound =
-    let audio = Browser.document.createElement "audio"
-    audio.setAttribute ("src", "../sounds/coin.wav")
-    audio
-[<Emit("$0.play()")>]
-let play audio = jsNative
-let playCoinSound () =
-    play coinSound
 
 let view board =
     let blankImage = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
@@ -60,7 +51,7 @@ let init() =
         List.iteri (fun col (cell:Browser.HTMLElement) ->
             cell.addEventListener_click (fun _ ->
                 board <- handleEvent (CellClicked (row,col)) board
-                playCoinSound ()
+                Sound.play coinSound
                 render ()
             )
             gridContainer.appendChild cell |> ignore
