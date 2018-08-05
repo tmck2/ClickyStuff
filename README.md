@@ -5,9 +5,9 @@ F# game where clicking matching tiles causes them to disappear.  I wrote this as
 ## WebUI
 
 Web frontend developed using FABLE
-
+```
 yarn start
-
+```
 ## ConsoleUI
 
 Console frontend for game developed for testing
