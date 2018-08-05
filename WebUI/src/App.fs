@@ -7,7 +7,10 @@ open Domain
 let width = 15
 let height = 15
 
-let mutable board = mkRandomBoard height width 1000
+let mutable game = {
+    Board = mkRandomBoard height width 1000
+    Score = 0
+}
 
 let coinSound = Sound.create "../sounds/coin.wav"
 
@@ -17,6 +20,8 @@ let gemImages =
 
 let gridContainer = Browser.document.getElementById "container"
 
+let scoreElement = Browser.document.getElementById "score"
+
 let imageGrid =
     [for _ in [0..height-1] ->
         [for _ in [0..width-1] ->
@@ -24,8 +29,9 @@ let imageGrid =
         ]
     ]
 
-let view board =
+let view game =
     let blankImage = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+    let {Board=board;Score=score} = game
     board
     |> List.iteri (fun row cells ->
         List.iteri (fun col cell ->
@@ -40,9 +46,10 @@ let view board =
                 | None -> blankImage
             imageGrid.[row].[col].setAttribute ("src", imgSrc)
         ) cells)
+    scoreElement.innerText <- (sprintf "%i" score)    
 
 let init() =
-    let render () = view board
+    let render () = view game
 
     render ()
 
@@ -50,9 +57,9 @@ let init() =
     |> List.iteri (fun row cells ->
         List.iteri (fun col (cell:Browser.HTMLElement) ->
             cell.addEventListener_click (fun _ ->
-                let curBoard = board
-                board <- handleEvent (CellClicked (row,col)) board
-                if not (curBoard = board) then
+                let curGame = game
+                game <- handleEvent (CellClicked (row,col)) game
+                if not (curGame = game) then
                     Sound.play coinSound
                     render ()
             )

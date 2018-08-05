@@ -113,17 +113,20 @@ let removeGemsAt locs (board:Board) : Board =
             else
                 cell))
 
-let handleEvent event (board:Board) : Board =
+let handleEvent event (game:Game) : Game =
+    let score n = (n-1)*(n-1) 
+    let board = game.Board
     match event with
     | CellClicked (row, col) ->
         let connected = connectedCellsWithSameType (row, col) board
+        let update =
+            removeGemsAt connected
+            >> dropGems
+            >> collapseEmptyColumns
         if List.length connected >= 2 then
-            board
-            |> removeGemsAt connected
-            |> dropGems
-            |> collapseEmptyColumns
+            { game with Board = update board; Score = game.Score + score (List.length connected) }
         else
-            board
+            game
 
 let mkRandomBoard rows cols seed =
     let r = new System.Random(seed)

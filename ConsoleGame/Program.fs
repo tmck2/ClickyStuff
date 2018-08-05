@@ -15,12 +15,15 @@ let instructions = [
 
 type Model = {
     Cursor: Position
-    Board: Board
+    Game: Game
 }
 
 let initModel () = {
     Cursor = 0,0
-    Board = mkRandomBoard height width 1000
+    Game = {
+        Board = mkRandomBoard height width 1000
+        Score = 0
+    }
 }
 
 module UI =
@@ -32,12 +35,12 @@ module UI =
         Console.ForegroundColor <- color
         printf "%c" ch
 
-let view (model:Model) =
+let view {Board=board as game} =
     Console.CursorVisible <- false
 
     UI.clearScreen |> ignore
 
-    model.Board
+    board
     |> List.iteri (fun y row ->
         List.iteri (fun x cell ->
             Console.SetCursorPosition (x,y)
@@ -57,16 +60,18 @@ let view (model:Model) =
     Console.ForegroundColor <- ConsoleColor.Black
     Console.CursorVisible <- true
 
-let rec gameLoop model =
-    view model
+let rec gameLoop ({Game=game;Cursor=cursor} as model:Model) =
+    let board = game.Board
 
-    Console.SetCursorPosition model.Cursor |> ignore
+    view game
+
+    Console.SetCursorPosition cursor |> ignore
 
     let keyInfo = Console.ReadKey (true)
 
-    let (x,y) = model.Cursor
+    let (x,y) = cursor
 
-    let h,w = List.length model.Board, List.length model.Board.[0]
+    let h,w = List.length board, List.length board.[0]
 
     match keyInfo.Key with
     | ConsoleKey.RightArrow ->
@@ -78,7 +83,7 @@ let rec gameLoop model =
     | ConsoleKey.UpArrow ->
         gameLoop { model with Cursor = (x,max (y-1) 0)}
     | ConsoleKey.Spacebar ->
-        gameLoop { model with Board = handleEvent (CellClicked (y,x)) model.Board }
+        gameLoop { model with Game = handleEvent (CellClicked (y,x)) game }
     | ConsoleKey.Q -> ()
     | _ -> gameLoop model
 

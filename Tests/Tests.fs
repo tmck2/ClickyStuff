@@ -5,15 +5,23 @@ open Types
 open Domain
 
 [<Fact>]
+let ``score is updated correctly`` () =
+    let initial = { Board = mkLevel ["ssssssdd"]; Score = 0 }
+    let updated = handleEvent (CellClicked (0,0)) initial
+    Assert.Equal (25, updated.Score)
+
+[<Fact>]
 let ``handleEvent CellClicked`` () =
-    let initial = mkLevel ["scd"
-                           "ssd"
-                           "ssd"]
-    let expected = mkLevel [".d."
-                            ".d."
-                            "cd."]
+    let initial = { Board = mkLevel ["scd"
+                                     "ssd"
+                                     "ssd"];
+                    Score = 0 }
+    let expected = { Board = mkLevel [".d."
+                                      ".d."
+                                      "cd."];
+                     Score = 0 }
     let actual = handleEvent (CellClicked (1,1)) initial
-    Assert.Equal<Board>(expected, actual) 
+    Assert.Equal<Board>(expected.Board, actual.Board) 
 
 [<Fact>]
 let ``removeGemsAt works correctly`` () =
