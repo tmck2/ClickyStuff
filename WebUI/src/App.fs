@@ -18,15 +18,20 @@ let gemImages =
 let gridContainer = Browser.document.getElementById "container"
 
 let imageGrid =
-    [for row in [0..height-1] ->
-        [for col in [0..width-1] ->
-            let img = Browser.document.createElement ("img")
-            img.setAttribute ("id", sprintf "%i-%i" row col)
-            img.setAttribute ("width", "48px")
-            img.setAttribute ("height", "48px")
-            img
+    [for _ in [0..height-1] ->
+        [for _ in [0..width-1] ->
+            Browser.document.createElement ("img")
         ]
     ]
+
+let coinSound =
+    let audio = Browser.document.createElement "audio"
+    audio.setAttribute ("src", "../sounds/coin.wav")
+    audio
+[<Emit("$0.play()")>]
+let play audio = jsNative
+let playCoinSound () =
+    play coinSound
 
 let view board =
     let blankImage = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
@@ -55,6 +60,7 @@ let init() =
         List.iteri (fun col (cell:Browser.HTMLElement) ->
             cell.addEventListener_click (fun _ ->
                 board <- handleEvent (CellClicked (row,col)) board
+                playCoinSound ()
                 render ()
             )
             gridContainer.appendChild cell |> ignore
