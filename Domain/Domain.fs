@@ -128,7 +128,7 @@ let handleEvent event (board:Board) : Board =
 let mkRandomBoard rows cols seed =
     let r = new System.Random(seed)
     [for _ in [0..rows-1] ->
-        [for _ in [0..cols] ->
+        [for _ in [0..cols-1] ->
             let i = r.Next(0,4)
             match i with
             | 0 -> Some Heart
