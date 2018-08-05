@@ -29,6 +29,7 @@ let imageGrid =
     ]
 
 let view board =
+    let blankImage = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
     board
     |> List.iteri (fun row cells ->
         List.iteri (fun col cell ->
@@ -40,7 +41,7 @@ let view board =
                     | Diamond -> gemImages.[1]
                     | Heart -> gemImages.[2]
                     | Club -> gemImages.[3]
-                | None -> "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                | None -> blankImage
             imageGrid.[row].[col].setAttribute ("src", imgSrc)
         ) cells)
 
