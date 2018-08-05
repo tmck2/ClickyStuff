@@ -50,9 +50,11 @@ let init() =
     |> List.iteri (fun row cells ->
         List.iteri (fun col (cell:Browser.HTMLElement) ->
             cell.addEventListener_click (fun _ ->
+                let curBoard = board
                 board <- handleEvent (CellClicked (row,col)) board
-                Sound.play coinSound
-                render ()
+                if not (curBoard = board) then
+                    Sound.play coinSound
+                    render ()
             )
             gridContainer.appendChild cell |> ignore
         ) cells

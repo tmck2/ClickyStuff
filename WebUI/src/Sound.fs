@@ -9,5 +9,5 @@ let create url =
     audio.setAttribute ("src", url)
     audio
 
-[<Emit("$0.play()")>]
+[<Emit("$0.currentTime=0;$0.play()")>]
 let play audio = jsNative
