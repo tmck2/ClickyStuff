@@ -34,6 +34,11 @@ let getCellAt (board:Board) (pos:Position) =
     else
         None
 
+let gemAt board pos =
+    match getCellAt board pos with
+    | None -> None
+    | Some gem -> Some gem
+
 let getNeighboringCells (board:Board) (pos:Position) =
     let offsets = [up;right;down;left]
     offsets |>
@@ -42,11 +47,26 @@ let getNeighboringCells (board:Board) (pos:Position) =
             r >= 0 && r < List.length board &&
             c >= 0 && c < List.length board.[0])
 
+let getMatchingNeighbors (board:Board) (pos:Position) =
+    let gem = gemAt board pos
+    getNeighboringCells board pos
+    |> List.map (fun pos -> (pos, gemAt board pos))
+    |> List.filter (fun (_,g) -> g <> None && g = gem)
+    |> List.map (fun (p,_) -> p)
+
+let anyMovesLeft (board: Board) =
+    (board
+    |> List.mapi (fun row cells ->
+        cells
+        |> List.mapi (fun col cell ->
+           getMatchingNeighbors board (row,col)
+           |> List.length
+        )
+        |> List.max
+    )
+    |> List.max) >= 1
+
 let connectedCellsWithSameType (pos:Position) (board:Board) =
-    let gemAt pos =
-        match getCellAt board pos with
-        | None -> None
-        | Some gem -> Some gem
     let rec find gem pos result =
         match pos with
         | [] -> result
@@ -55,11 +75,11 @@ let connectedCellsWithSameType (pos:Position) (board:Board) =
                 p
                 |> getNeighboringCells board
                 |> List.filter (fun pos ->
-                    gemAt pos = gem)
+                    gemAt board pos = gem)
                 |> List.filter (fun pos ->
                     not (List.exists ((=) pos) (ps@result)))
             find gem (cells@ps) (p::result)
-    find (gemAt pos) [pos] []
+    find (gemAt board pos) [pos] []
 
 
 let transposeBoard (board:Board) : Board =

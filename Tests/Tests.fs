@@ -4,6 +4,35 @@ open Xunit
 open Types
 open Domain
 
+
+[<Fact>]
+let ``with moves left, anyMovesLeft evaluates to true`` () =
+    let board = mkLevel ["hc";"hs"]
+    let expected = true
+    let actual = anyMovesLeft board
+    Assert.Equal(expected, actual)
+
+[<Fact>]
+let ``with one gem left, anyMovesLeft evaluates to false`` () =
+    let board = mkLevel ["h.";".."]
+    let expected = false
+    let actual = anyMovesLeft board
+    Assert.Equal(expected, actual)
+
+[<Fact>]
+let ``with no moves left, anyMovesLeft evaluates to false`` () =
+    let board = mkLevel ["hc";"ch"]
+    let expected = false
+    let actual = anyMovesLeft board
+    Assert.Equal(expected, actual)
+
+[<Fact>]
+let ``with no pieces left, anyMovesLeft evaluates to false`` () =
+    let board = mkLevel ["..";".."]
+    let expected = false
+    let actual = anyMovesLeft board
+    Assert.Equal(expected, actual)
+
 [<Fact>]
 let ``score is updated correctly`` () =
     let initial = { Board = mkLevel ["ssssssdd"]; Score = 0 }
