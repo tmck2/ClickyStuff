@@ -47,23 +47,20 @@ let connectedCellsWithSameType (pos:Position) (board:Board) =
         match getCellAt board pos with
         | None -> None
         | Some gem -> Some gem
-    let rec walk gem pos dir visited =
-        let step dir = 
-            let next = pos |+| dir
-            (if not (List.contains next visited)
-             && (gemAt next) = gem
-             && not ((gemAt next) = None) then
-                next::walk gem next dir (pos::visited)
-            else
-                [])
-        List.concat [
-            step up
-            step right
-            step down
-            step left
-        ] |> List.distinct
+    let rec find gem pos result =
+        match pos with
+        | [] -> result
+        | p::ps -> 
+            let cells =
+                p
+                |> getNeighboringCells board
+                |> List.filter (fun pos ->
+                    gemAt pos = gem)
+                |> List.filter (fun pos ->
+                    not (List.exists ((=) pos) (ps@result)))
+            find gem (cells@ps) (p::result)
+    find (gemAt pos) [pos] []
 
-    pos::walk (gemAt pos) pos (0,0) []
 
 let transposeBoard (board:Board) : Board =
     let h,w = List.length board, List.length board.[0]
