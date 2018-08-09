@@ -135,12 +135,13 @@ let handleEvent event (game:Game) : Game =
     let board = game.Board
     match event with
     | CellClicked (row, col) ->
+        let gem = (gemAt board (row, col))
         let connected = connectedCellsWithSameType (row, col) board
         let update =
             removeGemsAt connected
             >> dropGems
             >> collapseEmptyColumns
-        if List.length connected >= 2 then
+        if gem <> None && List.length connected >= 2 then
             { game with Board = update board; Score = game.Score + score (List.length connected) }
         else
             game

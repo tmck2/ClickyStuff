@@ -34,6 +34,12 @@ let ``with no pieces left, anyMovesLeft evaluates to false`` () =
     Assert.Equal(expected, actual)
 
 [<Fact>]
+let ``clicking an empty cell doesn't cause score to go up`` () =
+    let initial = { Board = mkLevel ["..";".s"]; Score = 0 }
+    let updated = handleEvent (CellClicked (0,0)) initial
+    Assert.Equal (0, updated.Score)
+
+[<Fact>]
 let ``score is updated correctly`` () =
     let initial = { Board = mkLevel ["ssssssdd"]; Score = 0 }
     let updated = handleEvent (CellClicked (0,0)) initial
